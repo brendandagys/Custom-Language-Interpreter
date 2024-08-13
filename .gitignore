@@ -1,0 +1,4 @@
+.DS_Store
+running-generate-ast.txt
+target/
+/**/*.class
