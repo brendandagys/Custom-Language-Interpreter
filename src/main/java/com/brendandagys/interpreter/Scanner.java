@@ -170,7 +170,7 @@ public class Scanner {
     }
 
     if (isAtEnd()) {
-      Main.error(line, "Unterminated string.");
+      Main.error(line, "Unterminated string");
       return;
     }
 
