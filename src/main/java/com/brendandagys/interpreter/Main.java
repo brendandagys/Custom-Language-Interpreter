@@ -9,7 +9,10 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class Main {
+  private static final Interpreter interpreter = new Interpreter();
+
   static boolean hadError = false;
+  static boolean hadRuntimeError = false;
 
   public static void main(String[] args) throws IOException {
     if (args.length > 1) {
@@ -28,6 +31,8 @@ public class Main {
 
     if (hadError)
       System.exit(65); // The input data was incorrect in some way
+    if (hadRuntimeError)
+      System.exit(70);
   }
 
   private static void runPrompt() throws IOException {
@@ -57,7 +62,7 @@ public class Main {
     if (hadError)
       return;
 
-    System.out.println(new AstPrinter().print(expression));
+    interpreter.interpret(expression);
   }
 
   static void error(int line, String message) {
@@ -76,5 +81,11 @@ public class Main {
     } else {
       report(token.line, " at '" + token.lexeme + "'", message);
     }
+  }
+
+  static void runtimeError(RuntimeError error) {
+    System.err.println(error.getMessage() +
+        "\n[line " + error.token.line + "]");
+    hadRuntimeError = true;
   }
 }
