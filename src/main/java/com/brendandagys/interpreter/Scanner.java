@@ -128,7 +128,7 @@ public class Scanner {
         } else if (isAlpha(c)) {
           identifier();
         } else {
-          Main.error(line, "Unexpected character.");
+          Main.error(line, "Unexpected character: " + c);
         }
         break;
     }
@@ -174,7 +174,7 @@ public class Scanner {
       return;
     }
 
-    advance(); // The closing "
+    advance(); // The closing `"`
 
     String value = source.substring(start + 1, current - 1); // Trim quotes
     addToken(STRING, value);
