@@ -1,3 +1,5 @@
+GRAMMAR, V1
+
 expression     → literal
                | unary
                | binary
@@ -9,3 +11,26 @@ unary          → ( "-" | "!" ) expression ;
 binary         → expression operator expression ;
 operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
                | "+"  | "-"  | "*" | "/" ;
+
+
+PRECEDENCE RULES FROM C, LOWEST TO HIGHEST
+
+Name      	  Operators	     Associates
+Equality	      == !=	          Left
+Comparison	  > >= < <=	        Left
+Term	           - +           	Left
+Factor	         / *	          Left
+Unary         	 ! -          	Right
+
+
+GRAMMAR, V2 (addresses precedence and associativity)
+
+expression     → equality ;
+equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term           → factor ( ( "-" | "+" ) factor )* ;
+factor         → unary ( ( "/" | "*" ) unary )* ;
+unary          → ( "!" | "-" ) unary
+               | primary ;
+primary        → NUMBER | STRING | "true" | "false" | "nil"
+               | "(" expression ")" ;
