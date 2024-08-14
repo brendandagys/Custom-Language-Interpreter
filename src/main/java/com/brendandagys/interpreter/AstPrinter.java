@@ -26,6 +26,11 @@ class AstPrinter implements Expr.Visitor<String> {
   }
 
   @Override
+  public String visitLogicalExpr(Expr.Logical expr) {
+    return expr.left + " " + expr.operator + " " + expr.right;
+  }
+
+  @Override
   public String visitLiteralExpr(Expr.Literal expr) {
     if (expr.value == null)
       return "nil";
