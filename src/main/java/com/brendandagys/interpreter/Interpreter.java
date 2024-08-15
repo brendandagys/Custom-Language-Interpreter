@@ -167,7 +167,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
   @Override
   public Void visitFunctionStmt(Stmt.Function stmt) {
-    UserFunction function = new UserFunction(stmt);
+    UserFunction function = new UserFunction(stmt, environment);
     environment.define(stmt.name.lexeme, function);
     return null;
   }
