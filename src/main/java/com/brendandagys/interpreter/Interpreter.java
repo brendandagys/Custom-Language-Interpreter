@@ -192,8 +192,18 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   @Override
   public Void visitClassStmt(Stmt.Class stmt) {
     environment.define(stmt.name.lexeme, null);
-    UserClass class_ = new UserClass(stmt.name.lexeme);
+
+    Map<String, UserFunction> methods = new HashMap<>();
+
+    for (Stmt.Function method : stmt.methods) {
+      UserFunction function = new UserFunction(method, environment);
+      methods.put(method.name.lexeme, function);
+    }
+
+    UserClass class_ = new UserClass(stmt.name.lexeme, methods);
+
     environment.assign(stmt.name, class_);
+
     return null;
   }
 

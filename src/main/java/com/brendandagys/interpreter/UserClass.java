@@ -5,9 +5,19 @@ import java.util.Map;
 
 class UserClass implements CustomCallable {
   final String name;
+  private final Map<String, UserFunction> methods;
 
-  UserClass(String name) {
+  UserClass(String name, Map<String, UserFunction> methods) {
     this.name = name;
+    this.methods = methods;
+  }
+
+  UserFunction findMethod(String name) {
+    if (methods.containsKey(name)) {
+      return methods.get(name);
+    }
+
+    return null;
   }
 
   @Override

@@ -16,6 +16,10 @@ class UserInstance {
       return fields.get(name.lexeme);
     }
 
+    UserFunction method = class_.findMethod(name.lexeme);
+    if (method != null)
+      return method;
+
     throw new RuntimeError(name, "Undefined property: '" + name.lexeme + "'");
   }
 
@@ -25,6 +29,6 @@ class UserInstance {
   }
 
   void set(Token name, Object value) {
-    fields.put(name.lexeme, value);
+    fields.put(name.lexeme, value); // We can create new fields on instances
   }
 }
