@@ -11,6 +11,12 @@ class UserFunction implements CustomCallable {
     this.declaration = declaration;
   }
 
+  UserFunction bind(UserInstance instance) {
+    Environment environment = new Environment(closure);
+    environment.define("this", instance);
+    return new UserFunction(declaration, environment);
+  }
+
   @Override
   public String toString() {
     return "<fn " + declaration.name.lexeme + ">";
