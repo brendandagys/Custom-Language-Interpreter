@@ -62,6 +62,14 @@ public class Main {
     if (hadError)
       return;
 
+    Resolver resolver = new Resolver(interpreter);
+
+    if (hadError)
+      return;
+
+    // Provides resolution data to `Interpreter` via `.resolve()`
+    resolver.resolve(statements);
+
     interpreter.interpret(statements);
   }
 
