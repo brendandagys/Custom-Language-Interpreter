@@ -5,8 +5,10 @@ import java.util.List;
 class UserFunction implements CustomCallable {
   private final Stmt.Function declaration;
   private final Environment closure;
+  private final boolean isInitializer;
 
-  UserFunction(Stmt.Function declaration, Environment closure) {
+  UserFunction(Stmt.Function declaration, Environment closure, boolean isInitializer) {
+    this.isInitializer = isInitializer;
     this.closure = closure;
     this.declaration = declaration;
   }
@@ -14,7 +16,7 @@ class UserFunction implements CustomCallable {
   UserFunction bind(UserInstance instance) {
     Environment environment = new Environment(closure);
     environment.define("this", instance);
-    return new UserFunction(declaration, environment);
+    return new UserFunction(declaration, environment, isInitializer);
   }
 
   @Override
@@ -38,8 +40,14 @@ class UserFunction implements CustomCallable {
     try {
       interpreter.executeBlock(declaration.body, environment);
     } catch (Return returnValue) {
+      if (isInitializer)
+        return closure.getAt(0, "this");
+
       return returnValue.value;
     }
+
+    if (isInitializer)
+      return closure.getAt(0, "this");
 
     return null;
   }

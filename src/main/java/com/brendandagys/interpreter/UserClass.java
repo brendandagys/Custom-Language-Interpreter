@@ -28,11 +28,22 @@ class UserClass implements CustomCallable {
   @Override
   public Object call(Interpreter interpreter, List<Object> arguments) {
     UserInstance instance = new UserInstance(this);
+
+    UserFunction initializer = findMethod("init");
+    if (initializer != null) {
+      initializer.bind(instance).call(interpreter, arguments);
+    }
+
     return instance;
   }
 
   @Override
   public int arity() {
-    return 0;
+    UserFunction initializer = findMethod("init");
+
+    if (initializer == null)
+      return 0;
+
+    return initializer.arity();
   }
 }
