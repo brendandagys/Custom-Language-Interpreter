@@ -5,10 +5,12 @@ import java.util.Map;
 
 class UserClass implements CustomCallable {
   final String name;
+  final UserClass superclass;
   private final Map<String, UserFunction> methods;
 
-  UserClass(String name, Map<String, UserFunction> methods) {
+  UserClass(String name, UserClass superclass, Map<String, UserFunction> methods) {
     this.name = name;
+    this.superclass = superclass;
     this.methods = methods;
   }
 
