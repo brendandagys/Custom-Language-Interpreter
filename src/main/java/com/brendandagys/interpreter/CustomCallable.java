@@ -2,7 +2,7 @@ package com.brendandagys.interpreter;
 
 import java.util.List;
 
-interface CallableFunction {
+interface CustomCallable {
   int arity();
 
   Object call(Interpreter interpreter, List<Object> arguments);

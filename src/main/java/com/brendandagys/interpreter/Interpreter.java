@@ -11,7 +11,7 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
   private final Map<Expr, Integer> locals = new HashMap<>();
 
   Interpreter() {
-    globals.define("clock", new CallableFunction() {
+    globals.define("clock", new CustomCallable() {
       @Override
       public int arity() {
         return 0;
@@ -321,11 +321,11 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
       arguments.add(evaluate(argument));
     }
 
-    if (!(callee instanceof CallableFunction)) {
+    if (!(callee instanceof CustomCallable)) {
       throw new RuntimeError(expr.paren, "Can only call functions and classes");
     }
 
-    CallableFunction function = (CallableFunction) callee;
+    CustomCallable function = (CustomCallable) callee;
 
     if (arguments.size() != function.arity()) {
       throw new RuntimeError(expr.paren, "Expected " + function.arity() + " arguments; got " + arguments.size());

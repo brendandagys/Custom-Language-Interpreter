@@ -2,7 +2,7 @@ package com.brendandagys.interpreter;
 
 import java.util.List;
 
-class UserFunction implements CallableFunction {
+class UserFunction implements CustomCallable {
   private final Stmt.Function declaration;
   private final Environment closure;
 
