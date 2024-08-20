@@ -2,3 +2,4 @@
 running-generate-ast.txt
 target/
 /**/*.class
+bin/
