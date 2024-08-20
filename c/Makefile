@@ -7,7 +7,7 @@ SOURCES=\
 	vm.c \
 
 bin/b: $(SOURCES)
-	cc -o bin/b -g -Wall $(SOURCES)
+	cc -o bin/b -g -Wall $(SOURCES) && bin/b
 
 clean:
 	rm -rf bin/*
