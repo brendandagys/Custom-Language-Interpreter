@@ -46,6 +46,11 @@ static Value peek(int distance) {
   return vm.stackTop[-1 - distance];
 }
 
+static bool isFalsey(Value value) {
+  // Only nil and false are falsey
+  return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
+}
+
 static InterpretResult run() {
 #define READ_BYTE() (*vm.ip++)
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
@@ -73,6 +78,7 @@ static InterpretResult run() {
 
     disassembleInstruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
 #endif
+
     uint8_t instruction;
     switch (instruction = READ_BYTE()) {
       case OP_CONSTANT: {
@@ -81,18 +87,27 @@ static InterpretResult run() {
         break;
       }
 
-      case OP_ADD:
-        BINARY_OP(NUMBER_VAL, +);
+        // clang-format off
+      case OP_NIL: push(NIL_VAL); break;
+      case OP_TRUE: push(BOOL_VAL(true)); break;
+      case OP_FALSE: push(BOOL_VAL(false)); break;
+
+      case OP_EQUAL: {
+        Value b = pop();
+        Value a = pop();
+        push(BOOL_VAL(valuesEqual(a, b)));
         break;
-      case OP_SUBTRACT:
-        BINARY_OP(NUMBER_VAL, -);
-        break;
-      case OP_MULTIPLY:
-        BINARY_OP(NUMBER_VAL, *);
-        break;
-      case OP_DIVIDE:
-        BINARY_OP(NUMBER_VAL, /);
-        break;
+      }
+
+      case OP_GREATER:  BINARY_OP(BOOL_VAL, >); break;
+      case OP_LESS:     BINARY_OP(BOOL_VAL, <); break;
+
+      case OP_ADD: BINARY_OP(NUMBER_VAL, +); break;
+      case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -); break;
+      case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
+      case OP_DIVIDE: BINARY_OP(NUMBER_VAL, /); break;
+      case OP_NOT: push(BOOL_VAL(isFalsey(pop()))); break;
+        // clang-format on
 
       case OP_NEGATE:
         if (!IS_NUMBER(peek(0))) {
