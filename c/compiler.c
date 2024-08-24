@@ -283,19 +283,52 @@ static void expression() {
   parsePrecedence(PREC_ASSIGNMENT);
 }
 
+static void expressionStatement() {
+  expression();
+  consume(TOKEN_SEMICOLON, "Expect ';' after expression");
+  emitByte(OP_POP);  // We don't need the value; it's discarded
+}
+
 static void printStatement() {
   expression();
   consume(TOKEN_SEMICOLON, "Expect ';' after value");
   emitByte(OP_PRINT);
 }
 
+static void synchronize() {
+  parser.panicMode = false;
+
+  while (parser.current.type != TOKEN_EOF) {
+    if (parser.previous.type == TOKEN_SEMICOLON) return;  // End a statement...
+    switch (parser.current.type) {                        // Begin a statement...
+      case TOKEN_CLASS:
+      case TOKEN_FUN:
+      case TOKEN_VAR:
+      case TOKEN_FOR:
+      case TOKEN_IF:
+      case TOKEN_WHILE:
+      case TOKEN_PRINT:
+      case TOKEN_RETURN:
+        return;
+
+      default:;
+    }
+
+    advance();
+  }
+}
+
 static void declaration() {
   statement();
+
+  if (parser.panicMode) synchronize();
 }
 
 static void statement() {
   if (match(TOKEN_PRINT)) {
     printStatement();
+  } else {
+    expressionStatement();
   }
 }
 
