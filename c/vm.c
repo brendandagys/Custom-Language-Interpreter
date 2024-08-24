@@ -141,7 +141,6 @@ static InterpretResult run() {
       case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
       case OP_DIVIDE: BINARY_OP(NUMBER_VAL, /); break;
       case OP_NOT: push(BOOL_VAL(isFalsey(pop()))); break;
-        // clang-format on
 
       case OP_NEGATE:
         if (!IS_NUMBER(peek(0))) {
@@ -151,11 +150,14 @@ static InterpretResult run() {
         push(NUMBER_VAL(-AS_NUMBER(pop())));
         break;
 
-      case OP_RETURN: {
+      case OP_PRINT: {
         printValue(pop());
         printf("\n");
-        return INTERPRET_OK;
+        break;
       }
+
+      case OP_RETURN: return INTERPRET_OK;
+        // clang-format on
     }
   }
 
