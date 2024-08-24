@@ -7,6 +7,7 @@ SOURCES=\
 	scanner.c \
 	value.c \
 	vm.c \
+	object.c \
 
 bin/b: $(SOURCES)
 	cc -o bin/b -g -Wall $(SOURCES) && bin/b
