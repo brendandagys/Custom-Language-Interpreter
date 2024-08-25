@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "common.h"
 #include "compiler.h"
@@ -129,6 +130,7 @@ static void emitReturn() {
 
 static uint8_t makeConstant(Value value) {
   int constant_index = addConstant(currentChunk(), value);
+
   if (constant_index > UINT8_MAX) {
     error("Too many constants in one chunk");
     return 0;
@@ -162,6 +164,13 @@ static void beginScope() {
 
 static void endScope() {
   current->scopeDepth--;
+
+  while (
+      current->localCount > 0 &&
+      current->locals[current->localCount - 1].depth > current->scopeDepth) {
+    emitByte(OP_POP);
+    current->localCount--;
+  }
 }
 
 // Forward declarations
@@ -173,6 +182,41 @@ static void parsePrecedence(Precedence precedence);
 
 static uint8_t identifierConstant(Token* name) {
   return makeConstant(OBJ_VAL(copyString(name->start, name->length)));
+}
+
+static bool identifiersEqual(Token* a, Token* b) {
+  if (a->length != b->length) return false;
+  return memcmp(a->start, b->start, a->length) == 0;
+}
+
+static void addLocal(Token name) {
+  if (current->localCount == UINT8_COUNT) {
+    error("Too many local variables in function");
+    return;
+  }
+
+  Local* local = &current->locals[current->localCount++];
+  local->name = name;
+  local->depth = current->scopeDepth;
+}
+
+static void declareVariable() {
+  if (current->scopeDepth == 0) return;
+
+  Token* name = &parser.previous;
+
+  for (int i = current->localCount - 1; i >= 0; i--) {
+    Local* local = &current->locals[i];
+    if (local->depth != -1 && local->depth < current->scopeDepth) {
+      break;
+    }
+
+    if (identifiersEqual(name, &local->name)) {
+      error("Already a variable with this name in this scope");
+    }
+  }
+
+  addLocal(*name);
 }
 
 static void binary(bool canAssign) {
@@ -326,11 +370,17 @@ static void parsePrecedence(Precedence precedence) {
 
 static uint8_t parseVariable(const char* errorMessage) {
   consume(TOKEN_IDENTIFIER, errorMessage);
+
+  declareVariable();
+  if (current->scopeDepth > 0) return 0;
+
   return identifierConstant(&parser.previous);
 }
 
 static void defineVariable(uint8_t global) {
-  // Instruction's operand is the index of the variable's name in the constant table
+  if (current->scopeDepth > 0) return;
+
+  // Instruction's operand is the index of the variable's name in the chunk's constant table
   emitBytes(OP_DEFINE_GLOBAL, global);
 }
 
@@ -358,6 +408,7 @@ static void varDeclaration() {
   } else {
     emitByte(OP_NIL);
   }
+
   consume(TOKEN_SEMICOLON, "Expect ';' after variable declaration");
 
   defineVariable(global);
