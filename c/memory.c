@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "memory.h"
 #include "vm.h"
@@ -22,6 +23,10 @@ static void freeObject(Obj* object) {
       FREE(ObjFunction, object);
       break;
     }
+
+    case OBJ_NATIVE:
+      printf("<native fn>");
+      break;
 
     case OBJ_STRING: {
       ObjString* string = (ObjString*)object;
